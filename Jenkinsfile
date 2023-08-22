@@ -10,12 +10,12 @@ pipeline {
         AWS_DEFAULT_REGION="us-east-1"
         }
     tools { 
-        maven '3.9.0' 
+        maven '3.9.4' 
     }
     stages {
         stage('Checkout git') {
             steps {
-               git branch: 'main', url: 'https://github.com/nkarwa-panitech/DevSecOps-project.git'
+               git branch: 'main', url: 'https://github.com/nkarwa-panitech/project-2.git'
             }
         }
         
@@ -38,7 +38,7 @@ pipeline {
 	}
         stage('SonarQube Analysis'){
             steps{
-                withSonarQubeEnv('sonar') {
+                withSonarQubeEnv('sonarqube-8.9.2') {
                         sh "mvn sonar:sonar"
                 }
             }

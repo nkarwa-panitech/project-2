@@ -54,7 +54,7 @@ pipeline {
         stage('Docker Build & Push') {
             steps {
       	        sh 'docker build -t nkarwapanitech/sprint-boot-app:$Docker_tag .'
-                withCredentials([string(credentialsId: 'docker', variable: 'docker_password')]) {		    
+                withCredentials([string(credentialsId: 'dockerhublogin', variable: 'docker_password')]) {		    
 				  sh 'docker login -u nkarwapanitech -p $docker_password'
 				  sh 'docker push nkarwapanitech/sprint-boot-app:$Docker_tag'
 			}

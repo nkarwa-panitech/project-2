@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: spring-app
-        image: nkarwapanitech/sprint-boot-app:$Docker_tag
+        image: nkarwapanitech/sprint-boot-app:Docker_tag
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080

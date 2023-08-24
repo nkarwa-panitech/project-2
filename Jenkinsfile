@@ -38,7 +38,7 @@ pipeline {
 	}
         stage('SonarQube Analysis'){
             steps{
-                withSonarQubeEnv('sonarqube-8.9.2') {
+                withSonarQubeEnv('sonar') {
                         sh "mvn sonar:sonar"
                 }
             }
@@ -70,7 +70,7 @@ pipeline {
             //       sh 'aws s3 cp report.html s3://panitech-devsecops-project/'
             //   }
             steps {
-              withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'aws', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+              withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'myaws', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                 sh '''
                   aws s3 cp report.html s3://panitech-devsecops-project/
                    '''
@@ -103,7 +103,7 @@ pipeline {
             agent { label 'node01' }
               steps {
                 script{
-                    kubernetesDeploy configs: 'spring-boot-deployment.yaml', kubeconfigId: 'kubernetes'
+                    kubernetesDeploy configs: 'spring-boot-deployment.yaml', kubeconfigId: 'kubeconfig'
                 }
             }
         }
@@ -120,11 +120,11 @@ def sendSlackNotifcation()
 {
     if ( currentBuild.currentResult == "SUCCESS" ) {
         buildSummary = "Job_name: ${env.JOB_NAME}\n Build_id: ${env.BUILD_ID} \n Status: *SUCCESS*\n Build_url: ${BUILD_URL}\n Job_url: ${JOB_URL} \n"
-        slackSend( channel: "#general", token: 'slack', color: 'good', message: "${buildSummary}")
+        slackSend( channel: "#class-1", token: 'slack', color: 'good', message: "${buildSummary}")
     }
     else {
         buildSummary = "Job_name: ${env.JOB_NAME}\n Build_id: ${env.BUILD_ID} \n Status: *FAILURE*\n Build_url: ${BUILD_URL}\n Job_url: ${JOB_URL}\n  \n "
-        slackSend( channel: "#general", token: 'slack', color : "danger", message: "${buildSummary}")
+        slackSend( channel: "#class-1", token: 'slack', color : "danger", message: "${buildSummary}")
     }
 }
 

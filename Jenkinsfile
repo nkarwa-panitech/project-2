@@ -94,8 +94,7 @@ pipeline {
 			 	script{
 				    sh '''final_tag=$(echo $Docker_tag | tr -d ' ')
 				     echo ${final_tag}test
-				   //  sed -i "s/docker_tag/$final_tag/g" spring-boot-deployment.yaml
-                                     grep -l 'docker_tag' spring-boot-deployment.yaml | xargs sed -i 's/docker_tag/$final_tag/g'
+				     sed -i "s/docker_tag/$final_tag/g"  spring-boot-deployment.yaml
 				     '''
 				}
 			}

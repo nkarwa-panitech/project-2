@@ -14,6 +14,11 @@ pipeline {
         maven '3.9.4' 
     }
     stages {
+	stage('CleanWorkspace') {
+            steps {
+                cleanWs()
+            }
+	}
         stage('Checkout git') {
             steps {
                git branch: 'main', url: 'https://github.com/nkarwa-panitech/project-2.git'
@@ -114,7 +119,6 @@ pipeline {
     post{
         always{
             sendSlackNotifcation()
-	    cleanWs()
             }
         }
 }

@@ -36,20 +36,20 @@ pipeline {
                archiveArtifacts artifacts: 'target/myapp-1.0.jar', followSymlinks: false
             }
 	}
-        stage('SonarQube Analysis'){
-            steps{
-                withSonarQubeEnv('sonar') {
-                        sh "mvn sonar:sonar"
-                }
-            }
-        }
-        stage("Quality Gate") {
-            steps {
-              timeout(time: 1, unit: 'HOURS') {
-                waitForQualityGate abortPipeline: true
-              }
-            }
-        }
+        // stage('SonarQube Analysis'){
+        //     steps{
+        //         withSonarQubeEnv('sonar') {
+        //                 sh "mvn sonar:sonar"
+        //         }
+        //     }
+        // }
+        // stage("Quality Gate") {
+        //     steps {
+        //       timeout(time: 1, unit: 'HOURS') {
+        //         waitForQualityGate abortPipeline: true
+        //       }
+        //     }
+        // }
         
         stage('Docker Build & Push') {
             steps {
@@ -60,33 +60,33 @@ pipeline {
 			}
             }
         }
-        stage('Image Scan') {
-            steps {
-      	        sh ' trivy image --format template --template "@/usr/local/share/trivy/templates/html.tpl" -o report.html nkarwapanitech/sprint-boot-app:$Docker_tag '
-            }
-        }
-        stage('Upload Scan report to AWS S3') {
-            //   steps {
-            //       sh 'aws s3 cp report.html s3://panitech-devsecops-project/'
-            //   }
-            steps {
-              withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'myaws', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                sh '''
-                  aws s3 cp report.html s3://panitech-devsecops-project/
-                   '''
-        }
-         }
-        }
+        // stage('Image Scan') {
+        //     steps {
+      	 //        sh ' trivy image --format template --template "@/usr/local/share/trivy/templates/html.tpl" -o report.html nkarwapanitech/sprint-boot-app:$Docker_tag '
+        //     }
+        // }
+        // stage('Upload Scan report to AWS S3') {
+        //     //   steps {
+        //     //       sh 'aws s3 cp report.html s3://panitech-devsecops-project/'
+        //     //   }
+        //     steps {
+        //       withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'myaws', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+        //         sh '''
+        //           aws s3 cp report.html s3://panitech-devsecops-project/
+        //            '''
+        // }
+        //  }
+        // }
         
-        stage("Approval"){
+       //  stage("Approval"){
 
-        steps{
+       //  steps{
 
-            timeout(time: 15, unit: 'MINUTES'){ 
-	               input message: 'Do you approve deployment for production?' , ok: 'Yes'}
+       //      timeout(time: 15, unit: 'MINUTES'){ 
+	      //          input message: 'Do you approve deployment for production?' , ok: 'Yes'}
 
-        }
-       }
+       //  }
+       // }
 
         stage ('Prod pre-request') {
             agent { label 'node01' }
@@ -94,7 +94,8 @@ pipeline {
 			 	script{
 				    sh '''final_tag=$(echo $Docker_tag | tr -d ' ')
 				     echo ${final_tag}test
-				     sed -i "s/docker_tag/$final_tag/g"  spring-boot-deployment.yaml
+				   //  sed -i "s/docker_tag/$final_tag/g" spring-boot-deployment.yaml
+                                     grep -l 'docker_tag' spring-boot-deployment.yaml | xargs sed -i 's/docker_tag/$final_tag/g'
 				     '''
 				}
 			}

@@ -5,6 +5,7 @@ def getDockerTag(){
 
 pipeline {
     agent {label 'node01'}
+    options { skipDefaultCheckout() }
     environment{
 	    Docker_tag = getDockerTag()
         AWS_DEFAULT_REGION="us-east-1"
@@ -100,7 +101,6 @@ pipeline {
 			}
         }
         stage('Deploy to k8s') {
-            agent { label 'node01' }
               steps {
                 script{
                     kubernetesDeploy configs: 'spring-boot-deployment.yaml', kubeconfigId: 'kubeconfig'

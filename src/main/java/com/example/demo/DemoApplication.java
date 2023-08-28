@@ -15,6 +15,6 @@ public class DemoApplication {
 
 	@RequestMapping("/")
   public String home() {
-    return "Hello Guys! This web application created by Panitech Academy Devops Team and uisng java spring boot framework. Application deployed in kubernetes cluster .";
+    return "Hello Guys! This web application created by Panitech Academy Devops Team and uisng java spring boot framework. Application deployed in kubernetes .";
   }
 }

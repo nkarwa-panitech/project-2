@@ -6,7 +6,7 @@ pipeline {
         AWS_DEFAULT_REGION="us-east-1"
         }
     tools { 
-        maven '3.9.4' 
+        maven '3.9.6' 
     }
     stages {
         stage('Checkout git') {
@@ -50,39 +50,39 @@ pipeline {
         stage('Docker Build & Push') {
             steps {
       	        sh 'docker build -t nkarwapanitech/sprint-boot-app:$Docker_tag .'
-                withCredentials([string(credentialsId: 'dockerhublogin', variable: 'docker_password')]) {		    
+                withCredentials([string(credentialsId: 'docker', variable: 'docker_password')]) {		    
 				  sh 'docker login -u nkarwapanitech -p $docker_password'
 				  sh 'docker push nkarwapanitech/sprint-boot-app:$Docker_tag'
 			}
             }
         }
-        stage('Image Scan') {
-            steps {
-      	        sh ' trivy image --format template --template "@/usr/local/share/trivy/templates/html.tpl" -o report.html nkarwapanitech/sprint-boot-app:$Docker_tag '
-            }
-        }
-        stage('Upload Scan report to AWS S3') {
-            //   steps {
-            //       sh 'aws s3 cp report.html s3://panitech-devsecops-project/'
-            //   }
-            steps {
-              withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'myaws', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                sh '''
-                  aws s3 cp report.html s3://panitech-devsecops-project/
-                   '''
-        }
-         }
-        }
+        // stage('Image Scan') {
+        //     steps {
+      	 //        sh ' trivy image --format template --template "@/usr/local/share/trivy/templates/html.tpl" -o report.html nkarwapanitech/sprint-boot-app:$Docker_tag '
+        //     }
+        // }
+        // stage('Upload Scan report to AWS S3') {
+        //     //   steps {
+        //     //       sh 'aws s3 cp report.html s3://panitech-devsecops-project/'
+        //     //   }
+        //     steps {
+        //       withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'myaws', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+        //         sh '''
+        //           aws s3 cp report.html s3://panitech-devsecops-project/
+        //            '''
+        // }
+        //  }
+        // }
         
-        stage("Approval"){
+       //  stage("Approval"){
 
-        steps{
+       //  steps{
 
-            timeout(time: 15, unit: 'MINUTES'){ 
-	               input message: 'Do you approve deployment for production?' , ok: 'Yes'}
+       //      timeout(time: 15, unit: 'MINUTES'){ 
+	      //          input message: 'Do you approve deployment for production?' , ok: 'Yes'}
 
-        }
-       }
+       //  }
+       // }
 
         stage ('Prod pre-request') {
             agent { label 'node01' }
@@ -105,22 +105,22 @@ pipeline {
         
  
     }
-    post{
-        always{
-            sendSlackNotifcation()
-            }
-        }
+    // post{
+    //     always{
+    //         sendSlackNotifcation()
+    //         }
+    //     }
 }
-def sendSlackNotifcation()
-{
-    if ( currentBuild.currentResult == "SUCCESS" ) {
-        buildSummary = "Job_name: ${env.JOB_NAME}\n Build_id: ${env.BUILD_ID} \n Status: *SUCCESS*\n Build_url: ${BUILD_URL}\n Job_url: ${JOB_URL} \n"
-        slackSend( channel: "#class-1", token: 'slack', color: 'good', message: "${buildSummary}")
-    }
-    else {
-        buildSummary = "Job_name: ${env.JOB_NAME}\n Build_id: ${env.BUILD_ID} \n Status: *FAILURE*\n Build_url: ${BUILD_URL}\n Job_url: ${JOB_URL}\n  \n "
-        slackSend( channel: "#class-1", token: 'slack', color : "danger", message: "${buildSummary}")
-    }
-}
+// def sendSlackNotifcation()
+// {
+//     if ( currentBuild.currentResult == "SUCCESS" ) {
+//         buildSummary = "Job_name: ${env.JOB_NAME}\n Build_id: ${env.BUILD_ID} \n Status: *SUCCESS*\n Build_url: ${BUILD_URL}\n Job_url: ${JOB_URL} \n"
+//         slackSend( channel: "#class-1", token: 'slack', color: 'good', message: "${buildSummary}")
+//     }
+//     else {
+//         buildSummary = "Job_name: ${env.JOB_NAME}\n Build_id: ${env.BUILD_ID} \n Status: *FAILURE*\n Build_url: ${BUILD_URL}\n Job_url: ${JOB_URL}\n  \n "
+//         slackSend( channel: "#class-1", token: 'slack', color : "danger", message: "${buildSummary}")
+//     }
+// }
 
     

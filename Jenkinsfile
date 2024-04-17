@@ -102,18 +102,18 @@ pipeline {
                         apiVersion: v1
                         kind: Pod
                         metadata:
-                        labels:
-                            run: kubectl-pod
-                        name: kubectl-pod
-                        spec:
-                        serviceAccountName: kubectl-deploy
-                        containers:
-                        - image: bitnami/kubectl:1.28
+                            labels:
+                                run: kubectl-pod
                             name: kubectl-pod
-                            command:
-                                - cat
-                            tty: true
-                        '''
+                        spec:
+                            serviceAccountName: kubectl-deploy
+                            containers:
+                            - image: bitnami/kubectl:1.28
+                                name: kubectl-pod
+                                command:
+                                    - cat
+                                tty: true
+                            '''
                     }
                 }
               steps {

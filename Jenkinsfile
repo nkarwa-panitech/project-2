@@ -104,7 +104,7 @@ pipeline {
                         spec:
                             serviceAccountName: kubectl-deploy
                             containers:
-                              - image: bitnami/kubectl:1.28
+                              - image: dtzar/helm-kubectl:3.12.3
                                 name: kubectl-pod
                                 command:
                                     - cat

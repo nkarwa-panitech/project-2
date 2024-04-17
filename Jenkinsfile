@@ -84,42 +84,49 @@ pipeline {
        //  }
        // }
 
-        stage ('Prod pre-request') {
-            agent { label 'node01' }
-			steps{
-			 	script{
-				    sh ''' final_tag=$(echo $Docker_tag | tr -d ' ')
-				     echo ${final_tag}test
-				     sed -i "s/docker_tag/$final_tag/g"  spring-boot-deployment.yaml
-				     '''
-				}
-			}
-        }
+        // stage ('Prod pre-request') {
+        //     agent { label 'node01' }
+		// 	steps{
+		// 	 	script{
+		// 		    sh ''' final_tag=$(echo $Docker_tag | tr -d ' ')
+		// 		     echo ${final_tag}test
+		// 		     sed -i "s/docker_tag/$final_tag/g"  spring-boot-deployment.yaml
+		// 		     '''
+		// 		}
+		// 	}
+        // }
         stage('Deploy to k8s') {
 		    agent {
-    kubernetes {
-      yaml '''
-        apiVersion: v1
-        kind: Pod
-        spec:
-          containers:
-          - name: maven
-            image: maven:alpine
-            command:
-            - cat
-            tty: true
-          - name: node
-            image: node:16-alpine3.12
-            command:
-            - cat
-            tty: true
-        '''
-    }
-  }
-              steps {
-                script{
-                    kubernetesDeploy configs: 'spring-boot-deployment.yaml', kubeconfigId: 'kubeconfig'
+              kubernetes {
+                    yaml '''
+                        apiVersion: v1
+                        kind: Pod
+                        metadata:
+                        labels:
+                            run: kubectl-pod
+                        name: kubectl-pod
+                        spec:
+                        serviceAccountName: kubectl-deploy
+                        containers:
+                        - image: bitnami/kubectl:1.28
+                            name: kubectl-pod
+                            command:
+                                - cat
+                            tty: true
+                        '''
+                    }
                 }
+              steps {
+                container('kubectl') {
+                      sh '''cd /tmp 
+                      git branch: 'main', url: 'https://github.com/nkarwa-panitech/project-2.git'
+                      final_tag=$(echo $Docker_tag | tr -d ' ')
+                      cd project-2/
+                      sed -i "s/docker_tag/$final_tag/g"  spring-boot-deployment.yaml
+                      kubectl apply -f spring-boot-deployment.yaml
+				     '''
+              }
+                
             }
         }
 		
@@ -143,4 +150,5 @@ pipeline {
 //         slackSend( channel: "#class-1", token: 'slack', color : "danger", message: "${buildSummary}")
 //     }
 // }
+
     

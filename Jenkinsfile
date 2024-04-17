@@ -96,7 +96,7 @@ pipeline {
 		// 	}
         // }
         stage('Deploy to k8s') {
-		    agent {
+	   agent {
               kubernetes {
                     yaml '''
                         apiVersion: v1
@@ -114,7 +114,12 @@ pipeline {
                             '''
                     }
                 }
+	      
               steps {
+		container('kubectl-pod') {
+			sh kubectl version
+                                 }
+		      
                 container('kubectl-pod') {
                       sh '''cd /tmp 
                       git branch: 'main', url: 'https://github.com/nkarwa-panitech/project-2.git'

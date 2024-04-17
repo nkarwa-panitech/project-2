@@ -86,7 +86,7 @@ pipeline {
        // }
 
         stage ('Prod pre-request') {
-            agent { label 'node01' }
+            // agent { label 'node01' }
 			steps{
 			 	script{
 				    sh ''' final_tag=$(echo $Docker_tag | tr -d ' ')
@@ -97,7 +97,7 @@ pipeline {
 			}
         }
 	stage('Deploy to k8s') {
-            agent { label 'node01' }
+            // agent { label 'node01' }
               steps {
                 script{
                     kubernetesDeploy configs: 'spring-boot-deployment.yaml', kubeconfigId: 'kubernetes'

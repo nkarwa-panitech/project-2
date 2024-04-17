@@ -57,6 +57,7 @@ pipeline {
             }
         }
         stage('Image Scan') {
+	    agent {label 'master'}
             steps {
       	        sh ' trivy image --format template --template "@/usr/local/share/trivy/templates/html.tpl" -o report.html nkarwapanitech/sprint-boot-app:$Docker_tag '
             }

@@ -104,13 +104,13 @@ pipeline {
                         spec:
                             serviceAccountName: kubectl-deploy
                             containers:
-                            - image: bitnami/kubectl:1.28
+                              - image: bitnami/kubectl:1.28
                                 name: kubectl-pod
                                 command:
                                     - cat
                                 tty: true
                                 securityContext:
-                                       privileged: true
+                                        privileged: true
                             '''
                     }
                 }

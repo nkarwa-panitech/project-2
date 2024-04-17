@@ -115,7 +115,7 @@ pipeline {
                     }
                 }
               steps {
-                container('kubectl') {
+                container('kubectl-pod') {
                       sh '''cd /tmp 
                       git branch: 'main', url: 'https://github.com/nkarwa-panitech/project-2.git'
                       final_tag=$(echo $Docker_tag | tr -d ' ')

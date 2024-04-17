@@ -117,7 +117,9 @@ pipeline {
 	      
               steps {
 		container('kubectl-pod') {
-			sh kubectl version
+			sh '''
+                         kubectl version
+			 '''
                                  }
 		      
                 container('kubectl-pod') {

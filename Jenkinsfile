@@ -101,10 +101,6 @@ pipeline {
                     yaml '''
                         apiVersion: v1
                         kind: Pod
-                        metadata:
-                            labels:
-                                run: kubectl-pod
-                            name: kubectl-pod
                         spec:
                             serviceAccountName: kubectl-deploy
                             containers:
@@ -113,6 +109,8 @@ pipeline {
                                 command:
                                     - cat
                                 tty: true
+                                securityContext:
+                                       privileged: true
                             '''
                     }
                 }

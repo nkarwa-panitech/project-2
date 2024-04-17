@@ -96,12 +96,33 @@ pipeline {
 			}
         }
         stage('Deploy to k8s') {
+		    agent {
+    kubernetes {
+      yaml '''
+        apiVersion: v1
+        kind: Pod
+        spec:
+          containers:
+          - name: maven
+            image: maven:alpine
+            command:
+            - cat
+            tty: true
+          - name: node
+            image: node:16-alpine3.12
+            command:
+            - cat
+            tty: true
+        '''
+    }
+  }
               steps {
                 script{
                     kubernetesDeploy configs: 'spring-boot-deployment.yaml', kubeconfigId: 'kubeconfig'
                 }
             }
         }
+		
         
  
     }
@@ -122,5 +143,4 @@ pipeline {
 //         slackSend( channel: "#class-1", token: 'slack', color : "danger", message: "${buildSummary}")
 //     }
 // }
-
     

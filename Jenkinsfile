@@ -98,4 +98,22 @@ pipeline {
             }
         }
     }
+
+
+post{
+        always{
+             sendSlackNotifcation()
+             }
+         }
+}
+def sendSlackNotifcation()
+{
+    if ( currentBuild.currentResult == "SUCCESS" ) {
+        buildSummary = "Job_name: ${env.JOB_NAME}\n Build_id: ${env.BUILD_ID} \n Status: *SUCCESS*\n Build_url: ${env.BUILD_URL}\n Job_url: ${env.JOB_URL} \n"
+        slackSend( color: 'good', message: "${buildSummary}")
+    }
+    else {
+        buildSummary = "Job_name: ${env.JOB_NAME}\n Build_id: ${env.BUILD_ID} \n Status: *FAILURE*\n Build_url: ${BUILD_URL}\n Job_url: ${JOB_URL}\n  \n "
+        slackSend( color : "danger", message: "${buildSummary}")
+    }
 }

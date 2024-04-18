@@ -139,7 +139,7 @@ post{
              sendSlackNotifcation()
              }
          }
-}
+
 def sendSlackNotifcation()
 {
     if ( currentBuild.currentResult == "SUCCESS" ) {

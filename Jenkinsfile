@@ -69,5 +69,33 @@ pipeline {
         }
          }
         }
+        stage("Approval"){
+
+        steps{
+
+            timeout(time: 15, unit: 'MINUTES'){ 
+	               input message: 'Do you approve deployment for production?' , ok: 'Yes'}
+
+        }
+       }
+       stage ('Prod pre-request') {
+            // agent { label 'node01' }
+			steps{
+			 	script{
+				    sh ''' final_tag=$(echo $Docker_tag | tr -d ' ')
+				     echo ${final_tag}test
+				     sed -i "s/docker_tag/$final_tag/g"  spring-boot-deployment.yaml
+				     '''
+				}
+			}
+        }
+        stage('Deploy to k8s') {
+            // agent { label 'node01' }
+              steps {
+                script{
+                    kubernetesDeploy configs: 'spring-boot-deployment.yaml', kubeconfigId: 'kubernetes'
+                }
+            }
+        }
     }
 }

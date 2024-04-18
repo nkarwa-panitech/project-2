@@ -78,22 +78,56 @@ pipeline {
 
         }
        }
-       stage ('Prod pre-request') {
-            // agent { label 'node01' }
-			steps{
-			 	script{
-				    sh ''' final_tag=$(echo $Docker_tag | tr -d ' ')
-				     echo ${final_tag}test
-				     sed -i "s/docker_tag/$final_tag/g"  spring-boot-deployment.yaml
-				     '''
-				}
-			}
-        }
+    //    stage ('Prod pre-request') {
+    //         // agent { label 'node01' }
+	// 		steps{
+	// 		 	script{
+	// 			    sh ''' final_tag=$(echo $Docker_tag | tr -d ' ')
+	// 			     echo ${final_tag}test
+	// 			     sed -i "s/docker_tag/$final_tag/g"  spring-boot-deployment.yaml
+	// 			     '''
+	// 			}
+	// 		}
+    //     }
+    //     stage('Deploy to k8s') {
+    //         // agent { label 'node01' }
+    //           steps {
+    //             script{
+    //                 kubernetesDeploy configs: 'spring-boot-deployment.yaml', kubeconfigId: 'kubernetes'
+    //             }
+    //         }
         stage('Deploy to k8s') {
-            // agent { label 'node01' }
-              steps {
-                script{
-                    kubernetesDeploy configs: 'spring-boot-deployment.yaml', kubeconfigId: 'kubernetes'
+        agent {
+                kubernetes {
+                        yaml '''
+                            apiVersion: v1
+                            kind: Pod
+                            spec:
+                                serviceAccountName: kubectl-deploy
+                                containers:
+                                - image: tfgco/kubectl:2.5.0
+                                    name: kubectl-pod
+                                    command:
+                                        - cat
+                                    tty: true
+                                    securityContext:
+                                            privileged: true
+                                '''
+                        }
+                    }
+            
+                steps {
+                
+                    container('kubectl-pod') {
+                        sh '''cd /tmp 
+                        git clone https://github.com/nkarwa-panitech/project-2.git
+                        final_tag=$(echo $Docker_tag | tr -d ' ')
+                        cd project-2/
+                        sed -i "s/docker_tag/$final_tag/g"  spring-boot-deployment.yaml
+                        kubectl apply -f spring-boot-deployment.yaml
+                        '''
+                }
+                    
                 }
             }
         }

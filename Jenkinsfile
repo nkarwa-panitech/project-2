@@ -46,5 +46,28 @@ pipeline {
               }
             }
         }
+        stage('Docker Build & Push') {
+            steps {
+      	        sh 'docker build -t nkarwapanitech/sprint-boot-app:$Docker_tag .'
+                withCredentials([string(credentialsId: 'docker', variable: 'docker_password')]) {		    
+				  sh 'docker login -u nkarwapanitech -p $docker_password'
+				  sh 'docker push nkarwapanitech/sprint-boot-app:$Docker_tag'
+			}
+            }
+        }
+        stage('Image Scan') {
+            steps {
+      	        sh ' trivy image --format template --template "@/usr/local/share/trivy/templates/html.tpl" -o report.html nkarwapanitech/sprint-boot-app:$Docker_tag '
+            }
+        }
+        stage('Upload Scan report to AWS S3') {
+            steps {
+              withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'aws-cred', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                sh '''
+                  aws s3 cp report.html s3://panitech-devsecops-project/
+                   '''
+        }
+         }
+        }
     }
 }

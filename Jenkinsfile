@@ -105,7 +105,7 @@ pipeline {
                             spec:
                                 serviceAccountName: kubectl-deploy
                                 containers:
-                                - image: tfgco/kubectl:2.5.0
+                                  - image: tfgco/kubectl:2.5.0
                                     name: kubectl-pod
                                     command:
                                         - cat

@@ -31,7 +31,7 @@ pipeline {
             steps{
                archiveArtifacts artifacts: 'target/myapp-1.0.jar', followSymlinks: false
             }
-	}
+	    }
         stage('SonarQube Analysis'){
             steps{
                 withSonarQubeEnv('sonar') {
@@ -131,14 +131,15 @@ pipeline {
                 }
             }
         }
-    }
+   
 
 
-post{
-        always{
-             sendSlackNotifcation()
-             }
-         }
+        post{
+                always{
+                    sendSlackNotifcation()
+                        }
+                    }
+}
 
 def sendSlackNotifcation()
 {
